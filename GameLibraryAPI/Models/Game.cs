@@ -14,5 +14,6 @@
         public Platform Platform { get; set; } = null!;
 
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
+        public string Tag { get; internal set; }
     }
 }

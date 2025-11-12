@@ -27,7 +27,7 @@ namespace GameLibraryAPI.Mapping
 
             CreateMap<Review, ReviewDto>()
                 .ForMember(dest => dest.GameTitle, opt => opt.MapFrom(src => src.Game.Title))
-                .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.User.Username));
+                .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.User.Login));
             CreateMap<ReviewCreateDto, Review>();
             CreateMap<ReviewUpdateDto, Review>();
         }

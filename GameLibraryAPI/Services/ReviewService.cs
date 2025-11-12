@@ -26,7 +26,7 @@ namespace GameLibraryAPI.Services
                 Comment = review.Comment,
                 CreatedAt = review.CreatedAt,
                 GameTitle = review.Game?.Title ?? string.Empty,
-                Username = review.User?.Username ?? string.Empty
+                Username = review.User?.Login ?? string.Empty
             };
         }
 

@@ -32,9 +32,9 @@ namespace GameLibraryAPI.Repositories
 
         public IEnumerable<Review> GetAll()
         {
-            return _context.Reviews
+                return _context.Reviews
                 .Include(r => r.Game)
-                .Include(r => r.User) 
+                .Include(r => r.User)
                 .ToList();
         }
 

@@ -2,12 +2,6 @@
 using GameLibraryAPI.Models;
 using GameLibraryAPI.Models.DTO.UserDTO;
 using GameLibraryAPI.Repositories;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace GameLibraryAPI.Services
 {
@@ -29,16 +23,30 @@ namespace GameLibraryAPI.Services
             return _userRepo.GetAll();
         }
 
-        public User? GetById(int id)
+        public User GetById(int id)
         {
-            return _userRepo.GetById(id);
+            var user = _userRepo.GetById(id);
+            if (user == null)
+                throw new ArgumentException($"Пользователь с Id = {id} не найден");
+
+            return user;
         }
 
-        public User? Update(int id, User user)
+        public User Update(int id, User user)
         {
             var existing = _userRepo.GetById(id);
             if (existing == null)
-                return null;
+                throw new ArgumentException($"Пользователь с Id = {id} не найден");
+
+            if (string.IsNullOrWhiteSpace(user.Login))
+                throw new ArgumentException("Логин не может быть пустым");
+
+            if (string.IsNullOrWhiteSpace(user.Email))
+                throw new ArgumentException("Email не может быть пустым");
+
+            var role = _roleRepo.GetById(user.RoleId);
+            if (role == null)
+                throw new ArgumentException($"Роль с Id = {user.RoleId} не найдена");
 
             existing.Login = user.Login;
             existing.Email = user.Email;
@@ -49,7 +57,11 @@ namespace GameLibraryAPI.Services
 
         public bool Delete(int id)
         {
-            return _userRepo.Delete(id);
+            var deleted = _userRepo.Delete(id);
+            if (!deleted)
+                throw new ArgumentException($"Пользователь с Id = {id} не найден");
+
+            return true;
         }
     }
 }

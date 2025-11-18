@@ -2,8 +2,9 @@ using GameLibraryAPI.Mapping;
 using GameLibraryAPI.Middleware;
 using GameLibraryAPI.Repositories;
 using GameLibraryAPI.Services;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using GameLibraryAPI.Models;
@@ -11,6 +12,28 @@ using GameLibraryAPI.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+    
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(v => v.Value.Errors.Count > 0)
+            .Select(v => new
+            {
+                field = v.Key,
+                error = v.Value.Errors.First().ErrorMessage
+            });
+
+        return new BadRequestObjectResult(new
+        {
+            status = 400,
+            message = "Ошибка валидации",
+            errors = errors
+        });
+    };
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -28,9 +51,9 @@ builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddScoped<IGenreService, GenreService>();
 builder.Services.AddScoped<IPlatformService, PlatformService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
-
 
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "MySuperSecretKey";
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "GameLibraryAPI";
@@ -55,6 +78,9 @@ builder.Services.AddAuthentication(options =>
 
 var app = builder.Build();
 
+app.UseMiddleware<ErrorHandlingMiddleware>();   
+app.UseAuthErrorHandling();                     
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -65,8 +91,6 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.MapControllers();
 

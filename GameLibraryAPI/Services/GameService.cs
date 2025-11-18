@@ -43,6 +43,7 @@ namespace GameLibraryAPI.Services
         {
             if (!_genreRepo.Exists(dto.GenreId))
                 throw new ArgumentException("Жанр с таким Id не найден");
+
             if (!_platformRepo.Exists(dto.PlatformId))
                 throw new ArgumentException("Платформа с таким Id не найдена");
 

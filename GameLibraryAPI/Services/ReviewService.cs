@@ -1,6 +1,7 @@
 ﻿using GameLibraryAPI.Models;
 using GameLibraryAPI.Models.DTO.ReviewDTO;
 using GameLibraryAPI.Repositories;
+using System;
 
 namespace GameLibraryAPI.Services
 {
@@ -58,8 +59,10 @@ namespace GameLibraryAPI.Services
         {
             if (!_gameRepo.Exists(dto.GameId))
                 throw new ArgumentException("Игра с указанным Id не найдена.");
+
             if (!_userRepo.Exists(dto.UserId))
                 throw new ArgumentException("Пользователь с указанным Id не найден.");
+
 
             var newReview = new Review
             {

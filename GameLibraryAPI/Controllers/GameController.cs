@@ -1,5 +1,6 @@
 ﻿using GameLibraryAPI.Models.DTO.GameDTO;
 using GameLibraryAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,6 +8,7 @@ namespace GameLibraryAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class GameController : ControllerBase
     {
         private readonly IGameService _gameService;
@@ -15,14 +17,14 @@ namespace GameLibraryAPI.Controllers
         {
             _gameService = gameService;
         }
-
+        [Authorize(Roles = "User,Admin")]
         [HttpGet]
         public IActionResult GetAll()
         {
             var games = _gameService.GetAll();
             return Ok(games);
         }
-
+        [Authorize(Roles = "User,Admin")]
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
@@ -32,7 +34,7 @@ namespace GameLibraryAPI.Controllers
 
             return Ok(game);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public IActionResult Create(GameCreateDto dto)
         {
@@ -42,7 +44,7 @@ namespace GameLibraryAPI.Controllers
             var created = _gameService.Create(dto);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public IActionResult Update(int id, GameUpdateDto dto)
         {
@@ -52,7 +54,7 @@ namespace GameLibraryAPI.Controllers
 
             return Ok(updated);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
